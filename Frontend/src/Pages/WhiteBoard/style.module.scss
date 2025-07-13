@@ -1,0 +1,22 @@
+@import 'variables';
+
+.container {
+	display: flex;
+	width: 100vw;
+	height: 92vh;
+	// justify-content: space-between;
+	justify-content: center;
+	align-items: center;
+
+	// @media (max-width: 768px) {
+	// 	justify-content: center;
+	// }
+}
+
+#orientationMessage {
+	justify-content: center;
+	p {
+		color: $textInverse;
+		font-size: $fontSize2;
+	}
+}

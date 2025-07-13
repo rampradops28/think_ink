@@ -1,0 +1,422 @@
+@import 'variables';
+
+/* Enhanced Toolbox Component Styles */
+.wrapper {
+	@include card;
+	position: absolute;
+	top: 8vh;
+	left: 0;
+	bottom: 0;
+	z-index: var(--z-dropdown);
+	max-width: 320px;
+	width: 100%;
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 0 var(--radius-xl) 0 0;
+	box-shadow: var(--shadow-xl);
+	
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: var(--space-4);
+	transition: var(--transition-normal);
+	
+	@include md {
+		max-width: 350px;
+	}
+
+	.toolicon {
+		position: absolute;
+		top: var(--space-4);
+		right: 0;
+		font-size: var(--font-size-2xl);
+		color: var(--gray-600);
+		transform: translate(100%, 0);
+		cursor: pointer;
+		transition: var(--transition-normal);
+		padding: var(--space-2);
+		border-radius: var(--radius-md);
+		
+		&:hover {
+			color: var(--primary-600);
+			background: var(--primary-50);
+			transform: translate(100%, 0) scale(1.1);
+		}
+		
+		@include md {
+			font-size: var(--font-size-3xl);
+		}
+	}
+
+	@media (max-height: 768px) {
+		max-width: 280px;
+	}
+}
+
+.hide {
+	transform: translateX(-100%);
+	opacity: 0;
+}
+
+.show {
+	display: flex;
+}
+
+.hide2 {
+	display: none;
+}
+
+.container {
+	flex-grow: 7;
+	max-height: 90%;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: var(--space-4);
+
+	.heading {
+		flex-grow: 3;
+		max-height: 30%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		align-items: center;
+		padding: var(--space-4);
+		border-radius: var(--radius-lg);
+		background: rgba(255, 255, 255, 0.1);
+		border: 1px solid rgba(255, 255, 255, 0.2);
+		color: var(--textColor2);
+		backdrop-filter: blur(10px);
+
+		@media (max-height: 768px) {
+			max-height: 150px;
+		}
+
+		.button {
+			@include button-primary;
+			width: 100%;
+			padding: var(--space-2) var(--space-3);
+			font-size: var(--font-size-sm);
+			font-weight: var(--font-weight-medium);
+			border-radius: var(--radius-lg);
+			transition: var(--transition-normal);
+			
+			&:focus {
+				outline: none;
+				box-shadow: 0 0 0 3px var(--primary-100);
+			}
+
+			&:disabled {
+				cursor: not-allowed;
+				background: var(--gray-300);
+				color: var(--gray-500);
+				transform: none;
+				
+				&:hover {
+					transform: none;
+					box-shadow: none;
+				}
+			}
+			
+			&:not(:disabled):hover {
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-md);
+			}
+		}
+
+		.roomName {
+			@include info;
+			width: 100%;
+			text-align: center;
+			padding: var(--space-2) var(--space-3);
+			font-size: var(--font-size-sm);
+			font-weight: var(--font-weight-medium);
+			
+			p {
+				color: var(--primary-900);
+				margin: 0;
+			}
+			
+			:nth-child(1) {
+				font-weight: var(--font-weight-semibold);
+			}
+			
+			:nth-child(2) {
+				font-style: italic;
+				color: var(--primary-700);
+			}
+			
+			&:hover {
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-md);
+			}
+		}
+		
+		.share {
+			display: flex;
+			width: 100%;
+			justify-content: center;
+			gap: var(--space-2);
+			
+			button {
+				flex-grow: 1;
+				@include button-secondary;
+				padding: var(--space-2) var(--space-3);
+				font-size: var(--font-size-sm);
+			}
+		}
+		
+		.connected {
+			width: 100%;
+			font-size: var(--font-size-sm);
+			background: var(--success-500);
+			color: var(--white);
+			padding: var(--space-2) var(--space-3);
+			border-radius: var(--radius-md);
+			text-align: center;
+			font-weight: var(--font-weight-medium);
+		}
+		
+		.disconnected {
+			width: 100%;
+			font-size: var(--font-size-sm);
+			background: var(--error-500);
+			color: var(--white);
+			padding: var(--space-2) var(--space-3);
+			border-radius: var(--radius-md);
+			text-align: center;
+			font-weight: var(--font-weight-medium);
+		}
+	}
+
+	.toolbox {
+		flex-grow: 7;
+		max-height: 70%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: var(--space-4);
+
+		label {
+			color: var(--textColor2);
+			font-size: var(--font-size-sm);
+			font-weight: var(--font-weight-medium);
+			margin-bottom: var(--space-2);
+		}
+
+		.tools {
+			display: flex;
+			flex-direction: column;
+			text-align: center;
+			gap: var(--space-3);
+			
+			span {
+				display: flex;
+				justify-content: space-evenly;
+				gap: var(--space-2);
+			}
+
+			button {
+				@include button-secondary;
+				width: 45px;
+				height: 35px;
+				padding: var(--space-2);
+				font-size: var(--font-size-sm);
+				font-weight: var(--font-weight-medium);
+				border-radius: var(--radius-md);
+				transition: var(--transition-normal);
+				
+				&:focus {
+					outline: none;
+					box-shadow: 0 0 0 3px var(--primary-100);
+				}
+
+				&:disabled {
+					cursor: not-allowed;
+					background: var(--gray-300);
+					color: var(--gray-500);
+					transform: none;
+					
+					&:hover {
+						transform: none;
+						box-shadow: none;
+					}
+				}
+				
+				&:not(:disabled):hover {
+					transform: translateY(-1px);
+					box-shadow: var(--shadow-md);
+				}
+			}
+			
+			.active {
+				background: var(--primary-700);
+				color: var(--white);
+				box-shadow: var(--shadow-md);
+				transform: translateY(-1px);
+			}
+		}
+
+		.lineWidth {
+			display: flex;
+			justify-content: space-evenly;
+			align-items: center;
+			gap: var(--space-2);
+
+			input {
+				max-width: 60px;
+				@include input;
+				padding: var(--space-1) var(--space-2);
+				font-size: var(--font-size-sm);
+				text-align: center;
+			}
+		}
+
+		.color {
+			display: flex;
+			justify-content: space-evenly;
+			gap: var(--space-2);
+			
+			input[type="color"] {
+				width: 40px;
+				height: 35px;
+				border: none;
+				border-radius: var(--radius-md);
+				cursor: pointer;
+				transition: var(--transition-normal);
+				
+				&:hover {
+					transform: scale(1.1);
+				}
+			}
+		}
+
+		.buttonsSection {
+			display: flex;
+			justify-content: space-around;
+			gap: var(--space-2);
+
+			.button {
+				flex-grow: 1;
+				@include button-secondary;
+				height: 35px;
+				padding: var(--space-2) var(--space-3);
+				font-size: var(--font-size-sm);
+				font-weight: var(--font-weight-medium);
+				border-radius: var(--radius-md);
+				transition: var(--transition-normal);
+				
+				&:focus {
+					outline: none;
+					box-shadow: 0 0 0 3px var(--primary-100);
+				}
+
+				&:disabled {
+					cursor: not-allowed;
+					background: var(--gray-300);
+					color: var(--gray-500);
+					transform: none;
+					
+					&:hover {
+						transform: none;
+						box-shadow: none;
+					}
+				}
+				
+				&:not(:disabled):hover {
+					transform: translateY(-1px);
+					box-shadow: var(--shadow-md);
+				}
+			}
+		}
+	}
+}
+
+.userdiv {
+	flex-grow: 3;
+	max-height: 35%;
+	@include card;
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	padding: var(--space-4);
+	color: var(--textColor2);
+	font-size: var(--font-size-base);
+	backdrop-filter: blur(10px);
+
+	.users {
+		overflow: auto;
+		max-height: 90%;
+		
+		li {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: var(--space-2) var(--space-3);
+			border-radius: var(--radius-md);
+			margin-bottom: var(--space-2);
+			transition: var(--transition-normal);
+			
+			p {
+				font-size: var(--font-size-sm);
+				margin: 0;
+			}
+			
+			:nth-child(1) {
+				font-weight: var(--font-weight-semibold);
+			}
+			
+			:nth-child(2) {
+				font-style: italic;
+				color: var(--textColor3);
+			}
+			
+			&:hover {
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-sm);
+			}
+		}
+		
+		.green {
+			background: var(--success-500);
+			color: var(--white);
+			
+			&:hover {
+				background: var(--success-600);
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-sm);
+			}
+		}
+		
+		.red {
+			background: var(--error-500);
+			color: var(--white);
+			
+			&:hover {
+				background: var(--error-600);
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-sm);
+			}
+		}
+	}
+}
+
+// Scrollbar styling for users list
+.userdiv .users::-webkit-scrollbar {
+	width: 6px;
+}
+
+.userdiv .users::-webkit-scrollbar-track {
+	background: var(--gray-100);
+	border-radius: var(--radius-full);
+}
+
+.userdiv .users::-webkit-scrollbar-thumb {
+	background: var(--gray-300);
+	border-radius: var(--radius-full);
+	
+	&:hover {
+		background: var(--gray-400);
+	}
+}

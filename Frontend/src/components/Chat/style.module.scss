@@ -1,0 +1,246 @@
+@import 'variables';
+
+/* Enhanced Chat Component Styles */
+.chat {
+	@include card;
+	position: absolute;
+	top: 8vh;
+	right: 0;
+	bottom: 0;
+	z-index: var(--z-dropdown);
+	max-width: 300px;
+	width: 100%;
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(20px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: var(--radius-xl) 0 0 0;
+	box-shadow: var(--shadow-xl);
+	
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	transition: var(--transition-normal);
+	
+	@include md {
+		max-width: 350px;
+	}
+
+	.msgicon {
+		position: absolute;
+		top: var(--space-4);
+		left: 0;
+		font-size: var(--font-size-2xl);
+		color: var(--gray-600);
+		transform: translate(-100%, 0);
+		cursor: pointer;
+		transition: var(--transition-normal);
+		padding: var(--space-2);
+		border-radius: var(--radius-md);
+		
+		&:hover {
+			color: var(--primary-600);
+			background: var(--primary-50);
+			transform: translate(-100%, 0) scale(1.1);
+		}
+		
+		@include md {
+			font-size: var(--font-size-3xl);
+		}
+	}
+	
+	@media (max-height: 768px) {
+		max-width: 250px;
+	}
+}
+
+.hide {
+	transform: translateX(100%);
+	opacity: 0;
+}
+
+.messages {
+	max-height: 92%;
+	overflow: auto;
+	display: flex;
+	flex-direction: column;
+	padding: var(--space-4);
+	gap: var(--space-3);
+
+	.userMessage,
+	.otherMessage {
+		display: flex;
+		max-width: 90%;
+		width: auto;
+		border-radius: var(--radius-lg);
+		padding: var(--space-3) var(--space-4);
+		font-size: var(--font-size-sm);
+		line-height: var(--line-height-normal);
+		overflow-wrap: break-word;
+		word-wrap: break-word;
+		position: relative;
+		transition: var(--transition-normal);
+		
+		&:hover {
+			transform: translateY(-1px);
+		}
+	}
+
+	.userMessage {
+		margin-left: auto;
+		background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+		color: var(--white);
+		box-shadow: var(--shadow-md);
+		
+		&::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			right: -8px;
+			width: 0;
+			height: 0;
+			border-left: 8px solid var(--primary-600);
+			border-top: 8px solid transparent;
+			border-bottom: 8px solid transparent;
+			transform: translateY(-50%);
+		}
+	}
+
+	.otherMessage {
+		margin-right: auto;
+		background: var(--gray-100);
+		color: var(--gray-900);
+		border: 1px solid var(--gray-200);
+		
+		&::before {
+			content: '';
+			position: absolute;
+			top: 50%;
+			left: -8px;
+			width: 0;
+			height: 0;
+			border-right: 8px solid var(--gray-100);
+			border-top: 8px solid transparent;
+			border-bottom: 8px solid transparent;
+			transform: translateY(-50%);
+		}
+	}
+	
+	.messageTime {
+		font-size: var(--font-size-xs);
+		color: var(--gray-500);
+		margin-top: var(--space-1);
+		opacity: 0.7;
+	}
+	
+	.userName {
+		font-weight: var(--font-weight-semibold);
+		font-size: var(--font-size-xs);
+		color: var(--primary-600);
+		margin-bottom: var(--space-1);
+	}
+}
+
+.form {
+	max-height: 8%;
+	display: flex;
+	gap: var(--space-2);
+	padding: var(--space-4);
+	border-top: 1px solid var(--gray-200);
+	background: var(--gray-50);
+
+	.input {
+		flex: 1;
+		@include input;
+		font-size: var(--font-size-sm);
+		padding: var(--space-2) var(--space-3);
+		border-radius: var(--radius-lg);
+		
+		&:disabled {
+			background: var(--gray-100);
+			color: var(--gray-500);
+			cursor: not-allowed;
+		}
+		
+		&:focus {
+			border-color: var(--primary-500);
+			box-shadow: 0 0 0 3px var(--primary-100);
+		}
+	}
+
+	.btn {
+		@include button-primary;
+		max-width: 80px;
+		padding: var(--space-2) var(--space-3);
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-medium);
+		border-radius: var(--radius-lg);
+		transition: var(--transition-normal);
+		
+		&:hover:not(:disabled) {
+			transform: translateY(-1px);
+			box-shadow: var(--shadow-md);
+		}
+
+		&:disabled {
+			background: var(--gray-300);
+			color: var(--gray-500);
+			cursor: not-allowed;
+			transform: none;
+			
+			&:hover {
+				transform: none;
+				box-shadow: none;
+			}
+		}
+	}
+}
+
+// Scrollbar styling for messages
+.messages::-webkit-scrollbar {
+	width: 6px;
+}
+
+.messages::-webkit-scrollbar-track {
+	background: var(--gray-100);
+	border-radius: var(--radius-full);
+}
+
+.messages::-webkit-scrollbar-thumb {
+	background: var(--gray-300);
+	border-radius: var(--radius-full);
+	
+	&:hover {
+		background: var(--gray-400);
+	}
+}
+
+// Animation for new messages
+@keyframes slideInRight {
+	from {
+		opacity: 0;
+		transform: translateX(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+.userMessage {
+	animation: slideInRight 0.3s ease-out;
+}
+
+.otherMessage {
+	animation: slideInLeft 0.3s ease-out;
+}
