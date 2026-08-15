@@ -1,70 +1,81 @@
-@import 'variables';
+@use 'variables' as *;
 
 /* Enhanced Chat Component Styles */
 .chat {
-	@include card;
 	position: absolute;
-	top: 8vh;
+	// `8vh` was a guess at the navbar height. The board container is the
+	// positioning context, so the panel can simply fill its right edge.
+	top: 0;
 	right: 0;
 	bottom: 0;
 	z-index: var(--z-dropdown);
 	max-width: 300px;
 	width: 100%;
-	background: rgba(255, 255, 255, 0.95);
-	backdrop-filter: blur(20px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
-	border-radius: var(--radius-xl) 0 0 0;
+	background: var(--surface);
+	border-left: 1px solid var(--border);
 	box-shadow: var(--shadow-xl);
-	
+
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
-	transition: var(--transition-normal);
-	
+	transition: transform 0.3s ease-in-out;
+
 	@include md {
 		max-width: 350px;
 	}
 
-	.msgicon {
+	@media (max-height: 768px) {
+		max-width: 250px;
+	}
+
+	// The toggle rides just outside the panel's left edge so it stays reachable
+	// once the panel slides away.
+	.msgToggle {
 		position: absolute;
 		top: var(--space-4);
 		left: 0;
-		font-size: var(--font-size-2xl);
-		color: var(--gray-600);
 		transform: translate(-100%, 0);
-		cursor: pointer;
-		transition: var(--transition-normal);
+		display: flex;
 		padding: var(--space-2);
-		border-radius: var(--radius-md);
-		
+		border: none;
+		border-radius: var(--radius-md) 0 0 var(--radius-md);
+		background: var(--surface);
+		box-shadow: var(--shadow-md);
+		color: var(--gray-600);
+		cursor: pointer;
+		transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+
 		&:hover {
 			color: var(--primary-600);
 			background: var(--primary-50);
-			transform: translate(-100%, 0) scale(1.1);
 		}
-		
+	}
+
+	.msgicon {
+		font-size: var(--font-size-2xl);
+
 		@include md {
 			font-size: var(--font-size-3xl);
 		}
 	}
-	
-	@media (max-height: 768px) {
-		max-width: 250px;
-	}
 }
 
+// Slides the panel off-canvas. It also set `opacity: 0`, which faded out the
+// toggle button with it - once hidden, the chat could not be reopened.
 .hide {
 	transform: translateX(100%);
-	opacity: 0;
 }
 
 .messages {
-	max-height: 92%;
-	overflow: auto;
+	// Percentage heights against a flex column left the composer floating and
+	// the list unable to scroll. The list takes the leftover space instead.
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
 	padding: var(--space-4);
 	gap: var(--space-3);
+	margin-bottom: 0;
 
 	.userMessage,
 	.otherMessage {
@@ -88,7 +99,7 @@
 	.userMessage {
 		margin-left: auto;
 		background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
-		color: var(--white);
+		color: var(--on-accent);
 		box-shadow: var(--shadow-md);
 		
 		&::before {
@@ -141,56 +152,43 @@
 }
 
 .form {
-	max-height: 8%;
+	// The composer keeps its natural height instead of being squeezed into 8%.
+	flex: 0 0 auto;
 	display: flex;
+	align-items: center;
 	gap: var(--space-2);
-	padding: var(--space-4);
-	border-top: 1px solid var(--gray-200);
-	background: var(--gray-50);
+	padding: var(--space-3);
+	border-top: 1px solid var(--border);
+	background: var(--surface-muted);
 
 	.input {
-		flex: 1;
 		@include input;
+		flex: 1 1 auto;
+		min-width: 0;
 		font-size: var(--font-size-sm);
 		padding: var(--space-2) var(--space-3);
 		border-radius: var(--radius-lg);
-		
+
 		&:disabled {
 			background: var(--gray-100);
 			color: var(--gray-500);
 			cursor: not-allowed;
 		}
-		
-		&:focus {
-			border-color: var(--primary-500);
-			box-shadow: 0 0 0 3px var(--primary-100);
-		}
 	}
 
 	.btn {
 		@include button-primary;
-		max-width: 80px;
-		padding: var(--space-2) var(--space-3);
+		flex: 0 0 auto;
+		width: auto;
+		min-height: 38px;
+		padding: var(--space-2) var(--space-4);
 		font-size: var(--font-size-sm);
-		font-weight: var(--font-weight-medium);
 		border-radius: var(--radius-lg);
-		transition: var(--transition-normal);
-		
-		&:hover:not(:disabled) {
-			transform: translateY(-1px);
-			box-shadow: var(--shadow-md);
-		}
 
 		&:disabled {
-			background: var(--gray-300);
-			color: var(--gray-500);
+			background: var(--gray-200);
+			color: var(--gray-400);
 			cursor: not-allowed;
-			transform: none;
-			
-			&:hover {
-				transform: none;
-				box-shadow: none;
-			}
 		}
 	}
 }

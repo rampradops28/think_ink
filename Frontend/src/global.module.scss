@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables' as *;
 
 // Modern CSS Reset and Base Styles
 *,
@@ -17,14 +17,12 @@ html {
 }
 
 body {
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-		'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-		sans-serif;
+	font-family: var(--font-sans);
 	font-size: var(--font-size-base);
 	line-height: var(--line-height-normal);
 	font-weight: var(--font-weight-normal);
 	color: var(--gray-900);
-	background: linear-gradient(135deg, var(--themeColor), var(--canvasColor));
+	background: var(--themeColor);
 	min-height: 100vh;
 	overflow-x: hidden;
 }
@@ -35,22 +33,17 @@ h1, h2, h3, h4, h5, h6 {
 	line-height: var(--line-height-tight);
 	color: var(--textColor2);
 	margin-bottom: var(--space-4);
+	// Long room names must not blow out narrow layouts.
+	overflow-wrap: break-word;
 }
 
+// Fluid instead of holding the desktop size all the way down to phones.
 h1 {
-	font-size: var(--font-size-4xl);
-	
-	@include md {
-		font-size: var(--font-size-4xl);
-	}
+	font-size: clamp(1.75rem, 1.2rem + 2.6vw, 2.75rem);
 }
 
 h2 {
-	font-size: var(--font-size-3xl);
-	
-	@include md {
-		font-size: var(--font-size-3xl);
-	}
+	font-size: clamp(1.375rem, 1.05rem + 1.5vw, 1.875rem);
 }
 
 h3 {
@@ -73,16 +66,19 @@ p {
 	margin-bottom: var(--space-4);
 	color: var(--textColor3);
 	line-height: var(--line-height-relaxed);
+	overflow-wrap: break-word;
 }
 
 // Links
 a {
-	color: var(--primary-600);
+	// `--accent` lightens under the dark theme; `--primary-600` did not, and
+	// failed contrast against the dark background.
+	color: var(--accent);
 	text-decoration: none;
-	transition: var(--transition-normal);
-	
+	transition: color 0.2s ease-in-out;
+
 	&:hover {
-		color: var(--primary-700);
+		color: var(--primary-500);
 		text-decoration: underline;
 	}
 }
@@ -101,15 +97,21 @@ img {
 }
 
 // Form elements
-input, textarea, select {
+input, textarea, select, button {
 	font-family: inherit;
 	font-size: inherit;
+	color: inherit;
 }
 
 // Focus styles
-*:focus {
+//
+// This was a blanket `*:focus`, which painted a ring on every mouse click and
+// around whole containers. `:focus-visible` limits it to keyboard navigation,
+// which is what the ring exists for.
+:focus-visible {
 	outline: 2px solid var(--primary-500);
 	outline-offset: 2px;
+	border-radius: var(--radius-sm);
 }
 
 // Selection
@@ -119,13 +121,18 @@ input, textarea, select {
 }
 
 // Scrollbar styling
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--gray-400) transparent;
+}
+
 ::-webkit-scrollbar {
 	width: 8px;
+	height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-	background: var(--gray-100);
-	border-radius: var(--radius-full);
+	background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -142,23 +149,48 @@ input, textarea, select {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
-	width: 100vw;
+	// `100vw` includes the scrollbar gutter, which forced a permanent
+	// horizontal scrollbar on desktop. `100%` tracks the real content box.
+	width: 100%;
 	background: linear-gradient(135deg, var(--themeColor), var(--canvasColor));
 	position: relative;
-	
+
 	// Add subtle pattern overlay
 	&::before {
 		content: '';
 		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background-image: 
+		inset: 0;
+		background-image:
 			radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
 			radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.02) 0%, transparent 50%);
 		pointer-events: none;
 		z-index: 0;
+	}
+}
+
+// Shown while a lazily-loaded route chunk is fetched.
+.routeFallback {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 60vh;
+	position: relative;
+	z-index: 1;
+}
+
+.spinner {
+	width: 2.5rem;
+	height: 2.5rem;
+	border-radius: var(--radius-full);
+	border: 3px solid var(--border);
+	border-top-color: var(--primary-500);
+	animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+	to {
+		transform: rotate(360deg);
 	}
 }
 

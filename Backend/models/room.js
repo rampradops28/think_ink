@@ -28,4 +28,5 @@ const RoomSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-module.exports = new mongoose.model('Room', RoomSchema);
+// `mongoose.model` is a factory, not a constructor.
+module.exports = mongoose.model('Room', RoomSchema);

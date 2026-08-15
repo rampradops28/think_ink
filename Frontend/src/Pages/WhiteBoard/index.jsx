@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { useGlobalContext } from '../../context';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from '../../utils/uuid';
 import { useParams } from 'react-router-dom';
 
 //Components
@@ -424,9 +424,7 @@ const WhiteBoard = () => {
 
 	if (orientation === 'portrait') {
 		return (
-			<div
-				id={style.orientationMessage}
-				className={style.container}>
+			<div className={style.orientationMessage}>
 				<p>Please rotate your device to landscape mode to view this page.</p>
 			</div>
 		);

@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import style from './style.module.scss';
 import { useGlobalContext } from '../../context';
 import { HiOutlineChat } from 'react-icons/hi';
 
 const Chat = ({ isConnected, messages, sendMessage }) => {
-	// console.log('chat');
-
 	const [message, setMessage] = useState('');
+	const [collapsed, setCollapsed] = useState(false);
 
 	const messageRef = useRef(null);
 
@@ -14,8 +13,7 @@ const Chat = ({ isConnected, messages, sendMessage }) => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		// console.log(message);
-		if (message) {
+		if (message.trim()) {
 			sendMessage(message);
 			setMessage('');
 		}
@@ -28,52 +26,56 @@ const Chat = ({ isConnected, messages, sendMessage }) => {
 	}, [messages]);
 
 	return (
-		<>
-			<div
-				id='chat'
-				className={style.chat}>
-				<HiOutlineChat
-					className={style.msgicon}
-					onClick={() => {
-						document.getElementById('chat').classList.toggle(style.hide);
-					}}
+		<div className={`${style.chat} ${collapsed ? style.hide : ''}`}>
+			{/*
+			  Was toggled by reaching for `document.getElementById('chat')` and
+			  flipping a class - React state owns the panel now.
+			*/}
+			<button
+				type='button'
+				className={style.msgToggle}
+				aria-label={collapsed ? 'Show chat' : 'Hide chat'}
+				aria-expanded={!collapsed}
+				onClick={() => setCollapsed((prev) => !prev)}>
+				<HiOutlineChat className={style.msgicon} />
+			</button>
+
+			<ul
+				className={style.messages}
+				ref={messageRef}>
+				{messages.map((msg, index) => (
+					<li
+						key={index}
+						className={
+							msg.userId === userId ? style.userMessage : style.otherMessage
+						}>
+						{msg.userId !== userId && msg.userName && (
+							<i>{msg.userName.split(' ')[0] + ': '}</i>
+						)}
+						{msg.message}
+					</li>
+				))}
+			</ul>
+
+			<form
+				className={style.form}
+				onSubmit={handleSubmit}>
+				<input
+					className={style.input}
+					placeholder={isSignedIn ? 'Type your message' : 'Sign in to chat'}
+					value={message}
+					onChange={(e) => setMessage(e.target.value)}
+					autoComplete='off'
+					disabled={!isConnected || !isSignedIn}
 				/>
-				<ul    
-					className={style.messages}
-					ref={messageRef}>
-					{messages.map((msg, index) => (
-						<li
-							key={index}
-							className={
-								msg.userId === userId ? style.userMessage : style.otherMessage
-							}>
-							{msg.userId !== userId && (
-								<i>{msg.userName.split(' ')[0] + ': '}</i>
-							)}
-							{msg.message}
-						</li>
-					))}
-				</ul>
-				<form
-					className={style.form}
-					onSubmit={handleSubmit}>
-					<input
-						className={style.input}
-						placeholder={isSignedIn ? 'Type your message' : 'Sign in to chat'}
-						value={message}
-						onChange={(e) => setMessage(e.target.value)}
-						autoComplete='off'
-						disabled={!isConnected || !isSignedIn}
-					/>
-					<button
-						className={style.btn}
-						disabled={!isConnected || !isSignedIn}
-						type='submit'>
-						Send
-					</button>
-				</form>
-			</div>
-		</>
+				<button
+					className={style.btn}
+					disabled={!isConnected || !isSignedIn || !message.trim()}
+					type='submit'>
+					Send
+				</button>
+			</form>
+		</div>
 	);
 };
 

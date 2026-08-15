@@ -1,32 +1,48 @@
+const STORAGE_KEY = 'thinkink-theme';
+
+/**
+ * Applies a colour mode by flipping a single `data-theme` attribute on <html>.
+ *
+ * The previous version wrote five custom properties individually with
+ * `style.setProperty`, which meant only those five could ever change between
+ * themes - the rest of the palette stayed on its light values. Driving the
+ * whole token set from one attribute lets every surface, border and text
+ * colour re-theme together.
+ */
 function setCSSValues(mode) {
-	switch (mode) {
-		// /--themeColor: #f0f0f0;
-		// --themeInverseColor: #000;
-		// --textColor2: #fff;
-		// --textColor3: #ccc;
-		// --canvasColor: #141414;
-		case 'dark': {
-			// document.documentElement.style.setProperty('--themeColor', '#000');
-			// document.documentElement.style.setProperty('--textColor2', '#fff');
-			// document.documentElement.style.setProperty('--textColor3', '#ccc');
-			// document.documentElement.style.setProperty('--themeInverseColor', '#fff');
-			// document.documentElement.style.setProperty('--canvasColor', '#141414');
-			document.documentElement.style.setProperty('--themeColor', '#121212');
-			document.documentElement.style.setProperty('--textColor2', '#fff');
-			document.documentElement.style.setProperty('--textColor3', '#ccc');
-			document.documentElement.style.setProperty('--themeInverseColor', '#fff');
-			document.documentElement.style.setProperty('--canvasColor', '#141414');
-			break;
-		}
-		case 'light':
-			document.documentElement.style.setProperty('--themeColor', '#fff');
-			document.documentElement.style.setProperty('--textColor2', '#000');
-			document.documentElement.style.setProperty('--textColor3', '#333');
-			document.documentElement.style.setProperty('--themeInverseColor', '#000');
-			document.documentElement.style.setProperty('--canvasColor', '#ddd');
-			break;
-		default:
-			console.log('invalid color mode');
+	if (mode !== 'dark' && mode !== 'light') {
+		console.warn(`Invalid color mode: ${mode}`);
+		return;
+	}
+
+	document.documentElement.setAttribute('data-theme', mode);
+
+	// Keep the browser UI (form controls, scrollbars) in step.
+	const meta = document.querySelector('meta[name="theme-color"]');
+	if (meta) meta.setAttribute('content', mode === 'dark' ? '#0f172a' : '#ffffff');
+
+	try {
+		localStorage.setItem(STORAGE_KEY, mode);
+	} catch {
+		// Private browsing or a full quota - the theme just will not persist.
 	}
 }
+
+/**
+ * Resolves the initial mode: an explicit past choice wins, otherwise fall back
+ * to the operating system preference.
+ */
+export function getInitialColorMode() {
+	try {
+		const stored = localStorage.getItem(STORAGE_KEY);
+		if (stored === 'dark' || stored === 'light') return stored;
+	} catch {
+		// Ignore and fall through to the OS preference.
+	}
+
+	return window.matchMedia?.('(prefers-color-scheme: dark)').matches
+		? 'dark'
+		: 'light';
+}
+
 export default setCSSValues;

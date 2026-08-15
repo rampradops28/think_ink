@@ -3,7 +3,7 @@ import customConfirmation from '../components/customConfirmation';
 import * as api from '../api/index.js';
 import reducer from './userReducer.jsx';
 import { socket } from '../socket';
-import setCSSValues from '../utils/setCSS.js';
+import setCSSValues, { getInitialColorMode } from '../utils/setCSS.js';
 
 const AppContext = React.createContext();
 export const userInitialState = {
@@ -19,22 +19,22 @@ export const userInitialState = {
 const AppProvider = ({ children }) => {
 	const [user, dispatch] = useReducer(reducer, userInitialState);
 
-	const [colorMode, setColorMode] = React.useState('dark'); //dark, light
-	const [zoom, setZoom] = React.useState(1);
+	// Resolves a stored preference, then the OS setting, instead of always
+	// starting dark and overwriting the user's last choice on every reload.
+	const [colorMode, setColorMode] = React.useState(getInitialColorMode);
 
+	// Restoring a session runs on every page load. A stored token that has
+	// expired (or was signed with an older JWT_SECRET) simply means "not signed
+	// in" - it used to raise an error toast on load, so it runs silently now and
+	// just clears the dead token.
 	const initialFromLocalStorage = async (tokenValue) => {
-		// console.log('hello from api');
 		await api.handler(
 			api.signinToken,
-			(data) => {
-				signIn(data);
-			},
+			(data) => signIn(data),
 			tokenValue,
-			() => {
-				localStorage.removeItem('token');
-			}
+			() => localStorage.removeItem('token'),
+			{ silent: true }
 		);
-		// console.log('hello from api2');
 	};
 
 	useEffect(() => {
@@ -87,9 +87,9 @@ const AppProvider = ({ children }) => {
 	};
 	const toggleColorMode = () => {
 		setColorMode((prevMode) => {
-			if (prevMode === 'dark') setCSSValues('light');
-			else setCSSValues('dark');
-			return prevMode === 'dark' ? 'light' : 'dark';
+			const nextMode = prevMode === 'dark' ? 'light' : 'dark';
+			setCSSValues(nextMode);
+			return nextMode;
 		});
 	};
 
@@ -111,8 +111,6 @@ const AppProvider = ({ children }) => {
 				signIn,
 				signOut,
 				updateUser,
-				zoom,
-				setZoom,
 				// getRoomId,
 				// updateRoomId,
 			}}>

@@ -1,52 +1,47 @@
 import style from './style.module.scss';
 import {
-	FaTwitter,
+	FaXTwitter,
 	FaFacebook,
 	FaInstagram,
 	FaLinkedin,
 	FaGithub,
-} from 'react-icons/fa';
+} from 'react-icons/fa6';
 import data from '../../../data';
-function SocailIcons() {
-	const socials = data.socials;
+
+// Driven by a table so adding a network is one entry rather than another
+// copy-pasted conditional block.
+const NETWORKS = [
+	{ key: 'github', label: 'GitHub', Icon: FaGithub },
+	{ key: 'linkedin', label: 'LinkedIn', Icon: FaLinkedin },
+	{ key: 'twitter', label: 'X', Icon: FaXTwitter },
+	{ key: 'facebook', label: 'Facebook', Icon: FaFacebook },
+	{ key: 'instagram', label: 'Instagram', Icon: FaInstagram },
+];
+
+function SocialIcons() {
+	const socials = data.socials ?? {};
+	const available = NETWORKS.filter(({ key }) => socials[key]);
+
+	if (available.length === 0) return null;
+
 	return (
 		<ul className={style.socialIcons}>
-			{socials.twitter && (
-				<li>
-					<a href={socials.twitter}>
-						<FaTwitter className={style.icon} />
+			{available.map(({ key, label, Icon }) => (
+				<li key={key}>
+					<a
+						href={socials[key]}
+						target='_blank'
+						// Without `noopener` the opened page can reach back through
+						// `window.opener` and navigate this tab.
+						rel='noopener noreferrer'
+						aria-label={label}
+						title={label}>
+						<Icon className={style.icon} />
 					</a>
 				</li>
-			)}
-			{socials.facebook && (
-				<li>
-					<a href={socials.facebook}>
-						<FaFacebook className={style.icon} />
-					</a>
-				</li>
-			)}
-			{socials.instagram && (
-				<li>
-					<a href={socials.instagram}>
-						<FaInstagram className={style.icon} />
-					</a>
-				</li>
-			)}
-			{socials.linkedin && (
-				<li>
-					<a href={socials.linkedin}>
-						<FaLinkedin className={style.icon} />
-					</a>
-				</li>
-			)}
-			{socials.github && (
-				<li>
-					<a href={socials.github}>
-						<FaGithub className={style.icon} />
-					</a>
-				</li>
-			)}
+			))}
 		</ul>
 	);
 }
-export default SocailIcons;
+
+export default SocialIcons;

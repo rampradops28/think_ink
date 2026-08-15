@@ -1,49 +1,56 @@
-import React from 'react';
+import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 //Styles
 import style from './global.module.scss';
 
 //Components
-import PrivateRoute from './components/PrivateRoute';
 import Navbar from './components/Navbar';
 
 //Pages
-import Homepage from './Pages/HomePage';
-import WhiteBoard from './Pages/WhiteBoard';
-import DashBooard from './Pages/DashBoard';
-import ErrorPage from './Pages/ErrorPage';
+//
+// Only the homepage ships in the initial bundle. The whiteboard pulls in the
+// canvas engine and Socket.IO wiring, which nobody needs until they open a
+// room, so each route is fetched on demand.
+const Homepage = lazy(() => import('./Pages/HomePage'));
+const WhiteBoard = lazy(() => import('./Pages/WhiteBoard'));
+const DashBoard = lazy(() => import('./Pages/DashBoard'));
+const ErrorPage = lazy(() => import('./Pages/ErrorPage'));
 
-import { useGlobalContext } from './context';
+const RouteFallback = () => (
+	<div className={style.routeFallback}>
+		<span
+			className={style.spinner}
+			role='status'
+			aria-label='Loading'
+		/>
+	</div>
+);
 
 function App() {
-	const { zoom } = useGlobalContext();
-
-	React.useEffect(() => {
-		document.documentElement.style.setProperty('--zoom', `${zoom}`);
-	}, [zoom]);
-
 	return (
 		<div className={style.app}>
 			<Navbar />
-			<Routes>
-				<Route
-					path='/'
-					element={<Homepage />}
-				/>
-				<Route
-					path='/room/:roomId'
-					element={<WhiteBoard />}
-				/>
-				<Route
-					path='/dashboard'
-					element={<DashBooard />}
-				/>
-				<Route
-					path='/*'
-					element={<ErrorPage />}
-				/>
-			</Routes>
+			<Suspense fallback={<RouteFallback />}>
+				<Routes>
+					<Route
+						path='/'
+						element={<Homepage />}
+					/>
+					<Route
+						path='/room/:roomId'
+						element={<WhiteBoard />}
+					/>
+					<Route
+						path='/dashboard'
+						element={<DashBoard />}
+					/>
+					<Route
+						path='/*'
+						element={<ErrorPage />}
+					/>
+				</Routes>
+			</Suspense>
 		</div>
 	);
 }

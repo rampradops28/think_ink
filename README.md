@@ -1,131 +1,174 @@
-# ShareSketch 🎨
+# ThinkInk 🎨
 
-**Modern Collaborative Drawing & Idea Sharing Platform**
- 
+**Think it. Ink it. Share it.**
 
-A feature-rich, real-time collaborative drawing platform built with **MERN Stack** and **Socket.IO**. Experience seamless creativity with modern UI design, real-time collaboration, and intuitive drawing tools.
+A real-time collaborative whiteboard built on the MERN stack and Socket.IO. Sketch,
+brainstorm and chat with your team on a shared canvas — no reloads, no waiting.
+
+---
 
 ## ✨ Features
 
-### 🎨 **Drawing & Collaboration**
-- **Real-time Drawing**: Pencil, rectangles, circles, lines with instant sync
-- **Multi-user Canvas**: Collaborate with unlimited users simultaneously
-- **Undo/Redo**: Smooth correction of drawing mistakes
-- **Color Picker**: Full color palette with transparency support
-- **Line Width Control**: Adjustable stroke thickness
+### 🎨 Drawing & Collaboration
+- **Real-time drawing** — pencil, rectangles, circles and lines sync instantly
+- **Multi-user canvas** — everyone in a room draws on the same surface
+- **Undo / redo** — step back through your own changes
+- **Colour picker** — full RGBA palette with transparency
+- **Adjustable stroke width**
 
-### 💬 **Communication**
-- **Real-time Chat**: Instant messaging with user indicators
-- **User Presence**: See who's online and active
-- **Guest Access**: Join without registration for quick collaboration
+### 💬 Communication
+- **Real-time chat** scoped to each room
+- **Live presence** — see who is online right now
+- **Guest access** — join a room without an account
 
-### 🎯 **Modern UI/UX**
-- **Glass Morphism Design**: Beautiful backdrop blur effects
-- **Responsive Layout**: Perfect on desktop, tablet, and mobile
-- **Dark/Light Themes**: Toggle between themes seamlessly
-- **Smooth Animations**: Polished interactions and transitions
-- **Accessibility**: WCAG compliant design system
+### 🎯 Interface
+- **Light & dark themes** that follow your OS by default and remember your choice
+- **Responsive layout** from phone to desktop
+- **Reduced-motion support** for users who ask the OS to limit animation
+- **Keyboard-visible focus rings** rather than outlines on every mouse click
 
-### 👤 **User Management**
-- **Profile Customization**: Upload images, edit name & bio
-- **JWT Authentication**: Secure login with token-based auth
-- **Room Management**: Create, join, and share drawing rooms
-- **User Status**: Real-time online/offline indicators
+### 👤 Accounts
+- **JWT authentication**
+- **Profile customisation** — image upload, name and bio
+- **Room management** — create, join, share and leave rooms
 
-## 🚀 Quick Start
+---
+
+## 🚀 Quick start
 
 ### Prerequisites
-- Node.js (v16+)
-- MongoDB
-- npm or yarn
+- Node.js 18 or newer
+- MongoDB running locally, or a MongoDB Atlas connection string
 
-### Installation
+### 1. Clone
 
-1. **Clone & Setup**
-   ```bash
-   git clone https://github.com/aslezar/ShareSketch.git
-   cd ShareSketch
-   ```
-
-2. **Server Setup**
-   ```bash
-   cd server
-   cp example.env .env
-   # Edit .env with your MongoDB URL and JWT secret
-   npm install
-   npm start
-   ```
-
-3. **Client Setup**
-   ```bash
-   cd ../client
-   npm install
-   npm run dev
-   ```
-
-4. **Open Browser**
-   ```
-   http://localhost:5173
-   ```
-
-## 🎨 Design System
-
-ShareSketch features a **modern design system** with:
-
-- **CSS Custom Properties**: Dynamic theming and consistent styling
-- **Responsive Breakpoints**: Mobile-first responsive design
-- **Component Library**: Reusable UI components with variants
-- **Animation System**: Smooth transitions and micro-interactions
-- **Typography Scale**: Consistent font hierarchy and spacing
-- **Color Palette**: Professional blue gradient theme with semantic colors
-
-## 🛠️ Tech Stack
-
-### Frontend
-- **React 18** - Modern UI framework
-- **Vite** - Fast build tool and dev server
-- **SCSS Modules** - Scoped styling with design system
-- **Socket.IO Client** - Real-time communication
-- **React Router** - Client-side routing
-
-### Backend
-- **Node.js** - Server runtime
-- **Express.js** - Web framework
-- **Socket.IO** - Real-time bidirectional communication
-- **MongoDB** - NoSQL database
-- **JWT** - Authentication tokens
-- **Multer** - File upload handling
-
-### Real-time Features
-- **Canvas Synchronization** - Instant drawing updates
-- **Chat Broadcasting** - Real-time messaging
-- **User Presence** - Live user status updates
-- **Room Management** - Dynamic room creation/joining
-
-## 📱 Responsive Design
-
-ShareSketch is **fully responsive** with:
-- **Mobile-First**: Optimized for touch devices
-- **Tablet Support**: Perfect middle-ground experience
-- **Desktop Enhanced**: Full feature set with larger canvas
-- **Adaptive Layout**: Components adjust to screen size
-
-## 🎯 Use Cases
-
-- **Remote Teams**: Collaborative brainstorming sessions
-- **Education**: Interactive teaching and learning
-- **Design Reviews**: Real-time feedback and iteration
-- **Creative Workshops**: Group ideation and sketching
-- **Prototyping**: Quick wireframe collaboration
-
-## 🔧 Environment Variables
-
-```env
-PORT=8000
-MONGO_URL=mongodb://localhost:27017/sharesketch
-JWT_SECRET=your-super-secret-jwt-key
-JWT_LIFETIME=7d
+```bash
+git clone https://github.com/rampradops28/think_ink.git
+cd think_ink
 ```
 
+### 2. Server
 
-*Built with ❤️ using modern web technologies*
+```bash
+cd Backend
+cp example.env .env      # then fill in MONGO_URL and JWT_SECRET
+npm install
+npm run dev              # nodemon; use `npm start` for a plain node process
+```
+
+The API listens on <http://localhost:8000>. `GET /api/health` returns `{ success: true }`
+once it is up.
+
+### 3. Client
+
+```bash
+cd ../Frontend
+npm install
+npm run dev
+```
+
+Open <http://localhost:5173>.
+
+---
+
+## 🔧 Environment variables
+
+### Backend (`Backend/.env`)
+
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `MONGO_URL` | yes | — | MongoDB connection string |
+| `JWT_SECRET` | yes | — | Secret used to sign tokens; use a long random string |
+| `JWT_LIFETIME` | no | `7d` | Token validity (`7d`, `24h`, `30m`, …) |
+| `PORT` | no | `8000` | Port the HTTP + Socket.IO server binds to |
+| `CLIENT_URL` | no | `http://localhost:5173` | Origin permitted by CORS and Socket.IO |
+| `NODE_ENV` | no | `development` | `production` enables CSP and disables the Socket.IO admin UI |
+
+### Frontend (`Frontend/.env`, all optional)
+
+| Variable | Default (dev) | Default (prod) | Description |
+| --- | --- | --- | --- |
+| `VITE_API_URL` | `http://localhost:8000/api` | `/api` | REST base URL |
+| `VITE_SOCKET_URL` | `http://localhost:8000` | current origin | Socket.IO URL |
+| `VITE_SERVER_URL` | `http://localhost:8000` | — | Target for the dev proxy |
+
+---
+
+## 🛠️ Tech stack
+
+### Frontend
+- **React 19** with lazy-loaded routes
+- **Vite 8** (Rolldown) for builds and dev server
+- **SCSS modules** on a CSS custom-property design system
+- **Socket.IO client** for real-time sync
+- **React Router 7**
+- **react-colorful** for colour selection
+
+### Backend
+- **Express 5** — native async error handling
+- **Socket.IO** for canvas, chat and presence
+- **MongoDB + Mongoose 9**
+- **JWT** authentication, **bcryptjs** password hashing
+- **Multer 2** for profile-image uploads
+- **Helmet**, CORS, rate limiting and a custom input sanitizer
+
+---
+
+## 📁 Project structure
+
+```
+think_ink/
+├── Backend/
+│   ├── controllers/         # REST handlers (auth, room, user)
+│   ├── controller-socket/   # Socket.IO handlers (canvas, chat, room)
+│   ├── db/                  # Connection + migration
+│   ├── errors/              # Typed API errors
+│   ├── middleware/          # auth, error-handler, sanitize
+│   ├── models/              # Mongoose schemas
+│   ├── routes/              # Route definitions
+│   └── server.js
+└── Frontend/
+    ├── public/              # Static assets served as-is
+    ├── src/
+    │   ├── api/             # Axios client
+    │   ├── assets/
+    │   ├── components/
+    │   ├── context/         # Global state
+    │   ├── Pages/
+    │   ├── socket/
+    │   ├── styles/          # theme.scss — all design tokens
+    │   └── utils/
+    ├── _variables.scss      # Shared Sass mixins (emits no CSS)
+    └── vite.config.js
+```
+
+---
+
+## 🎨 Design system
+
+All design tokens live in `Frontend/src/styles/theme.scss` as CSS custom properties.
+Theming works by flipping a single `data-theme` attribute on `<html>`; the neutral
+ramp inverts under the dark theme so shared mixins stay correct in both modes
+without per-component overrides.
+
+Sass files consume the shared mixins with `@use 'variables' as *`. `_variables.scss`
+deliberately emits no CSS of its own, so importing it from 20+ modules costs nothing
+in output size.
+
+---
+
+## 📦 Production build
+
+```bash
+cd Frontend && npm run build      # emits Frontend/dist
+cd ../Backend && NODE_ENV=production npm start
+```
+
+The server serves `Frontend/dist` as static files and falls back to `index.html` for
+client-side routes, so a single process can host both.
+
+---
+
+## 📄 License
+
+MIT

@@ -1,0 +1,86 @@
+@use 'variables' as *;
+
+.wrapper {
+	position: relative;
+	display: inline-flex;
+}
+
+.swatch {
+	width: 44px;
+	height: 32px;
+	padding: 3px;
+	cursor: pointer;
+	border-radius: var(--radius-md);
+	border: 2px solid var(--border);
+	background: var(--surface);
+	box-shadow: var(--shadow-sm);
+	transition: border-color 0.2s ease-in-out, transform 0.2s ease-in-out;
+
+	&:hover {
+		border-color: var(--primary-400);
+		transform: translateY(-1px);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-500);
+		outline-offset: 2px;
+	}
+}
+
+// Checkerboard sits on the button; the fill paints over it. That way a
+// partially transparent colour reads as transparent rather than as a
+// lighter shade of itself.
+.swatch {
+	background-image: linear-gradient(45deg, var(--gray-300) 25%, transparent 25%),
+		linear-gradient(-45deg, var(--gray-300) 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, var(--gray-300) 75%),
+		linear-gradient(-45deg, transparent 75%, var(--gray-300) 75%);
+	background-size: 8px 8px;
+	background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+
+.swatchFill {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border-radius: var(--radius-sm);
+}
+
+.popover {
+	position: absolute;
+	bottom: calc(100% + var(--space-2));
+	left: 0;
+	z-index: var(--z-popover);
+	padding: var(--space-3);
+	border-radius: var(--radius-lg);
+	background: var(--surface);
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-xl);
+	animation: pickerIn 0.15s ease-out;
+
+	// Keep the panel on screen when the toolbox sits near the right edge.
+	@media (max-width: #{$breakpoint-sm - 1px}) {
+		left: auto;
+		right: 0;
+	}
+}
+
+.value {
+	margin-top: var(--space-2);
+	font-size: var(--font-size-xs);
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+	color: var(--gray-600);
+	white-space: nowrap;
+}
+
+@keyframes pickerIn {
+	from {
+		opacity: 0;
+		transform: translateY(4px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
