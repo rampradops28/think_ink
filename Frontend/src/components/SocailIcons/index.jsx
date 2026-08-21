@@ -1,11 +1,11 @@
 import style from './style.module.scss';
 import {
-	FaXTwitter,
+	FaTwitter,
 	FaFacebook,
 	FaInstagram,
 	FaLinkedin,
 	FaGithub,
-} from 'react-icons/fa6';
+} from 'react-icons/fa';
 import data from '../../../data';
 
 // Driven by a table so adding a network is one entry rather than another
@@ -13,7 +13,7 @@ import data from '../../../data';
 const NETWORKS = [
 	{ key: 'github', label: 'GitHub', Icon: FaGithub },
 	{ key: 'linkedin', label: 'LinkedIn', Icon: FaLinkedin },
-	{ key: 'twitter', label: 'X', Icon: FaXTwitter },
+	{ key: 'twitter', label: 'Twitter', Icon: FaTwitter },
 	{ key: 'facebook', label: 'Facebook', Icon: FaFacebook },
 	{ key: 'instagram', label: 'Instagram', Icon: FaInstagram },
 ];
