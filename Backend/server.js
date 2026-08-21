@@ -15,6 +15,7 @@ require('dotenv').config();
 const connectDB = require('./db/connect');
 
 const isProduction = process.env.NODE_ENV === 'production';
+const PORT = process.env.PORT || 8000;
 
 //Start Express App
 const app = express();
