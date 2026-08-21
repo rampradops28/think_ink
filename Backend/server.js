@@ -14,6 +14,8 @@ require('dotenv').config();
 
 const connectDB = require('./db/connect');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 //Start Express App
 const app = express();
 const server = http.createServer(app);
@@ -68,7 +70,7 @@ app.use(
 		credentials: true,
 	})
 ); //enable CORS
-app.use(xss()); //prevent XSS attacks
+app.use(sanitize()); //prevent XSS attacks & NoSQL injection
 app.use(morgan('common')); //logger
 
 //Static client build
