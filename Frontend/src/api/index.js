@@ -2,8 +2,7 @@ import axios from 'axios';
 import config from '../../config';
 import { toast } from 'react-toastify';
 
-const URL =
-	process.env.NODE_ENV === 'production' ? '/api' : config.serverAPIURL;
+const URL = config.serverAPIURL;
 const API = axios.create({ baseURL: URL });
 //for mobile
 // const API = axios.create({ baseURL: '/api' });

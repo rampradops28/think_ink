@@ -19,10 +19,27 @@ const connectDB = require('./db/connect');
 const app = express();
 const server = http.createServer(app);
 
+// CORS Origin Configuration
+const sanitizeOrigin = (url) => (url ? url.replace(/\/+$/, '') : '');
+
+const rawOrigins = [
+	process.env.LOCAL_CLIENT_URL || 'http://localhost:5173',
+	process.env.DEPLOYED_CLIENT_URL,
+	'http://localhost:3000',
+	'https://admin.socket.io',
+	...(process.env.ALLOWED_ORIGINS
+		? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+		: []),
+].filter(Boolean);
+
+const allowedOrigins = rawOrigins.map(sanitizeOrigin);
+
 //scoket.io
 const io = require('socket.io')(server, {
 	cors: {
-		origin: ['http://localhost:5173', 'https://admin.socket.io', '*'],
+		origin: allowedOrigins,
+		methods: ['GET', 'POST'],
+		credentials: true,
 	},
 });
 require('./socketio')(io);
@@ -43,7 +60,12 @@ app.use(
 );
 app.use(express.json());
 app.use(helmet()); //set security HTTP headers
-app.use(cors()); //enable CORS
+app.use(
+	cors({
+		origin: allowedOrigins,
+		credentials: true,
+	})
+); //enable CORS
 app.use(xss()); //prevent XSS attacks
 app.use(morgan('common')); //logger
 
