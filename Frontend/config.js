@@ -6,14 +6,21 @@
  * be served from the host that serves the client.
  */
 
-const isProd = import.meta.env.PROD;
+const rawBackendURL =
+	import.meta.env.VITE_BACKEND_URL ||
+	import.meta.env.VITE_SERVER_API_URL ||
+	import.meta.env.VITE_API_URL ||
+	(import.meta.env.DEV ? 'http://localhost:8000' : 'https://think-ink-backend-2802-artz.onrender.com');
+
+const backendBaseURL = rawBackendURL.replace(/\/+$/, '').replace(/\/api$/, '');
 
 const socketURL =
-	import.meta.env.VITE_SOCKET_URL ??
-	(isProd ? window.location.origin : 'http://localhost:8000');
+	import.meta.env.VITE_SOCKET_URL?.replace(/\/+$/, '') || backendBaseURL;
 
 const serverAPIURL =
-	import.meta.env.VITE_API_URL ?? (isProd ? '/api' : 'http://localhost:8000/api');
+	import.meta.env.VITE_SERVER_API_URL?.replace(/\/+$/, '') ||
+	import.meta.env.VITE_API_URL?.replace(/\/+$/, '') ||
+	`${backendBaseURL}/api`;
 
 // Backing resolution of the shared canvas, independent of the display size.
 const canvasResolution = 2048;
