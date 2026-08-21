@@ -54,18 +54,14 @@ const UserSchema = new mongoose.Schema(
 	{ timestamps: true }
 );
 
-UserSchema.pre('save', async function (next) {
-	if (!this.isModified('password')) {
-		return next(); // If password field is not modified, move to the next middleware
-	}
+// Mongoose no longer passes a `next` callback to *async* middleware - it awaits
+// the returned promise instead. The old signature took `next` and called it,
+// which threw "next is not a function" on every save.
+UserSchema.pre('save', async function () {
+	if (!this.isModified('password')) return;
 
-	try {
-		const salt = await bcrypt.genSalt(10);
-		this.password = await bcrypt.hash(this.password, salt);
-		next();
-	} catch (error) {
-		return next(error);
-	}
+	const salt = await bcrypt.genSalt(10);
+	this.password = await bcrypt.hash(this.password, salt);
 });
 
 UserSchema.methods.generateToken = function () {
@@ -74,18 +70,23 @@ UserSchema.methods.generateToken = function () {
 		throw new Error('JWT_SECRET environment variable is not set');
 	}
 
-	// Set default JWT_LIFETIME if not provided or invalid
-	let expiresIn = '7d'; // Default to 7 days
-	if (process.env.JWT_LIFETIME) {
-		// Validate JWT_LIFETIME format
-		const validFormats = /^(\d+[smhd]|\d+)$/;
-		if (validFormats.test(process.env.JWT_LIFETIME)) {
-			expiresIn = process.env.JWT_LIFETIME;
-		} else {
-			console.warn(`Invalid JWT_LIFETIME format: ${process.env.JWT_LIFETIME}. Using default: 7d`);
-		}
-	} else {
+	// Set default JWT_LIFETIME if not provided or invalid.
+	//
+	// A unit is required. `jsonwebtoken` reads a bare number as *seconds*, so a
+	// value like "20" silently expires every token 20 seconds after login - the
+	// previous pattern accepted that and made the app look like it was randomly
+	// rejecting valid credentials.
+	let expiresIn = '7d';
+	const lifetime = process.env.JWT_LIFETIME;
+
+	if (!lifetime) {
 		console.warn('JWT_LIFETIME not set. Using default: 7d');
+	} else if (!/^\d+\s*(s|m|h|d|w|y)$/i.test(lifetime)) {
+		console.warn(
+			`Invalid JWT_LIFETIME "${lifetime}" - it needs a unit (e.g. 30m, 24h, 7d). Using default: 7d`
+		);
+	} else {
+		expiresIn = lifetime;
 	}
 
 	return jwt.sign({ userId: this._id }, process.env.JWT_SECRET, {
@@ -98,4 +99,6 @@ UserSchema.methods.comparePassword = async function (pswrd) {
 	return isMatch;
 };
 
-module.exports = new mongoose.model('User', UserSchema);
+// `mongoose.model` is a factory, not a constructor - calling it with `new`
+// happened to work but is not supported.
+module.exports = mongoose.model('User', UserSchema);

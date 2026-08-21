@@ -1,8 +1,10 @@
 import { io } from 'socket.io-client';
 import config from '../../config';
 
-// "undefined" means the URL will be computed from the `window.location` object
-const URL = config.socketURL;
-export const socket = io(URL, {
+// `process` does not exist in the browser. `config.socketURL` already resolves
+// to the current origin in production and the local server in development.
+export const socket = io(config.socketURL, {
 	autoConnect: false,
+	// Prefer WebSocket but keep polling as a fallback for restrictive proxies.
+	transports: ['websocket', 'polling'],
 });

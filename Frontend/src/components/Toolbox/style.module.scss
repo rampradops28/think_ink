@@ -1,4 +1,4 @@
-@import 'variables';
+@use 'variables' as *;
 
 /* Enhanced Toolbox Component Styles */
 .wrapper {
@@ -10,9 +10,10 @@
 	z-index: var(--z-dropdown);
 	max-width: 320px;
 	width: 100%;
-	background: rgba(255, 255, 255, 0.95);
+	background: var(--surface);
 	backdrop-filter: blur(20px);
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	-webkit-backdrop-filter: blur(20px);
+	border: 1px solid var(--border);
 	border-radius: 0 var(--radius-xl) 0 0;
 	box-shadow: var(--shadow-xl);
 	
@@ -26,24 +27,32 @@
 		max-width: 350px;
 	}
 
-	.toolicon {
+	// The toggle rides just outside the panel's right edge, so it stays on
+	// screen when the panel slides away.
+	.toolToggle {
 		position: absolute;
 		top: var(--space-4);
 		right: 0;
-		font-size: var(--font-size-2xl);
-		color: var(--gray-600);
 		transform: translate(100%, 0);
-		cursor: pointer;
-		transition: var(--transition-normal);
+		display: flex;
 		padding: var(--space-2);
-		border-radius: var(--radius-md);
-		
+		border: none;
+		border-radius: 0 var(--radius-md) var(--radius-md) 0;
+		background: var(--surface);
+		box-shadow: var(--shadow-md);
+		color: var(--gray-600);
+		cursor: pointer;
+		transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+
 		&:hover {
 			color: var(--primary-600);
 			background: var(--primary-50);
-			transform: translate(100%, 0) scale(1.1);
 		}
-		
+	}
+
+	.toolicon {
+		font-size: var(--font-size-2xl);
+
 		@include md {
 			font-size: var(--font-size-3xl);
 		}
@@ -54,9 +63,18 @@
 	}
 }
 
+// Slides the panel off-canvas. It previously also set `opacity: 0`, which
+// faded out the toggle button along with the panel - once hidden, there was no
+// way to bring the toolbox back.
 .hide {
 	transform: translateX(-100%);
-	opacity: 0;
+}
+
+.label {
+	font-size: var(--font-size-sm);
+	font-weight: var(--font-weight-medium);
+	color: var(--gray-600);
+	white-space: nowrap;
 }
 
 .show {
@@ -68,103 +86,86 @@
 }
 
 .container {
-	flex-grow: 7;
-	max-height: 90%;
+	flex: 1 1 auto;
+	// Percentage max-heights on a flex column meant the sections fought each
+	// other for space and the panel could not scroll when it ran out. Letting
+	// the column own the leftover space and scroll is predictable at any height.
+	min-height: 0;
+	overflow-y: auto;
 	width: 100%;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
-	gap: var(--space-4);
+	gap: var(--space-3);
 
 	.heading {
-		flex-grow: 3;
-		max-height: 30%;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
 		align-items: center;
-		padding: var(--space-4);
+		// `justify-content: space-between` inside a `max-height: 30%` box
+		// stretched the gaps between the connection pill, room name and share
+		// buttons to whatever was left over. A fixed gap keeps them evenly
+		// spaced regardless of panel height.
+		gap: var(--space-2);
+		flex-shrink: 0;
+		padding: var(--space-3);
 		border-radius: var(--radius-lg);
-		background: rgba(255, 255, 255, 0.1);
-		border: 1px solid rgba(255, 255, 255, 0.2);
+		background: var(--surface-muted);
+		border: 1px solid var(--border);
 		color: var(--textColor2);
-		backdrop-filter: blur(10px);
-
-		@media (max-height: 768px) {
-			max-height: 150px;
-		}
 
 		.button {
 			@include button-primary;
 			width: 100%;
+			min-height: 38px;
 			padding: var(--space-2) var(--space-3);
 			font-size: var(--font-size-sm);
-			font-weight: var(--font-weight-medium);
-			border-radius: var(--radius-lg);
-			transition: var(--transition-normal);
-			
-			&:focus {
-				outline: none;
-				box-shadow: 0 0 0 3px var(--primary-100);
-			}
-
-			&:disabled {
-				cursor: not-allowed;
-				background: var(--gray-300);
-				color: var(--gray-500);
-				transform: none;
-				
-				&:hover {
-					transform: none;
-					box-shadow: none;
-				}
-			}
-			
-			&:not(:disabled):hover {
-				transform: translateY(-1px);
-				box-shadow: var(--shadow-md);
-			}
+			border-radius: var(--radius-md);
 		}
 
 		.roomName {
 			@include info;
 			width: 100%;
-			text-align: center;
+			// The `info` mixin adds a bottom margin, which double-spaced these
+			// rows now that the parent supplies a gap.
+			margin-bottom: 0;
+			justify-content: center;
+			gap: var(--space-1);
 			padding: var(--space-2) var(--space-3);
 			font-size: var(--font-size-sm);
 			font-weight: var(--font-weight-medium);
-			
+			// A room name with no spaces would otherwise widen the whole panel.
+			overflow-wrap: anywhere;
+
 			p {
 				color: var(--primary-900);
 				margin: 0;
 			}
-			
-			:nth-child(1) {
+
+			b {
 				font-weight: var(--font-weight-semibold);
 			}
-			
-			:nth-child(2) {
-				font-style: italic;
-				color: var(--primary-700);
-			}
-			
+
+			// Hover lift on a static label reads as interactive; it is not.
 			&:hover {
-				transform: translateY(-1px);
-				box-shadow: var(--shadow-md);
+				transform: none;
+				box-shadow: none;
 			}
 		}
 		
 		.share {
-			display: flex;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
 			width: 100%;
-			justify-content: center;
 			gap: var(--space-2);
-			
+
 			button {
-				flex-grow: 1;
 				@include button-secondary;
-				padding: var(--space-2) var(--space-3);
+				width: 100%;
+				min-height: 38px;
+				padding: var(--space-2);
 				font-size: var(--font-size-sm);
+				white-space: nowrap;
+				border-radius: var(--radius-md);
 			}
 		}
 		
@@ -172,7 +173,7 @@
 			width: 100%;
 			font-size: var(--font-size-sm);
 			background: var(--success-500);
-			color: var(--white);
+			color: var(--on-accent);
 			padding: var(--space-2) var(--space-3);
 			border-radius: var(--radius-md);
 			text-align: center;
@@ -183,7 +184,7 @@
 			width: 100%;
 			font-size: var(--font-size-sm);
 			background: var(--error-500);
-			color: var(--white);
+			color: var(--on-accent);
 			padding: var(--space-2) var(--space-3);
 			border-radius: var(--radius-md);
 			text-align: center;
@@ -192,83 +193,88 @@
 	}
 
 	.toolbox {
-		flex-grow: 7;
-		max-height: 70%;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
+		// Was `justify-content: space-between` in a `max-height: 70%` box, so
+		// the gaps between tool rows grew and shrank with the panel height.
 		gap: var(--space-4);
 
 		label {
 			color: var(--textColor2);
 			font-size: var(--font-size-sm);
 			font-weight: var(--font-weight-medium);
-			margin-bottom: var(--space-2);
+			// The parent supplies the rhythm via `gap`; this margin added an
+			// extra, inconsistent step on only the rows that carry a label.
+			margin-bottom: 0;
 		}
 
 		.tools {
 			display: flex;
 			flex-direction: column;
-			text-align: center;
-			gap: var(--space-3);
-			
+			align-items: flex-start;
+			gap: var(--space-2);
+
+			// The four tool buttons were fixed-width boxes in a `space-evenly`
+			// row, so they bunched up at one size and left ragged gaps at
+			// another. An equal-column grid keeps them evenly sized and evenly
+			// spaced at every panel width.
 			span {
-				display: flex;
-				justify-content: space-evenly;
+				display: grid;
+				grid-template-columns: repeat(4, 1fr);
 				gap: var(--space-2);
+				width: 100%;
 			}
 
 			button {
 				@include button-secondary;
-				width: 45px;
-				height: 35px;
+				width: 100%;
+				// Square-ish targets that stay above the 44px touch minimum.
+				aspect-ratio: 1;
+				min-height: 44px;
 				padding: var(--space-2);
-				font-size: var(--font-size-sm);
-				font-weight: var(--font-weight-medium);
+				font-size: var(--font-size-lg);
 				border-radius: var(--radius-md);
-				transition: var(--transition-normal);
-				
-				&:focus {
-					outline: none;
-					box-shadow: 0 0 0 3px var(--primary-100);
-				}
 
 				&:disabled {
 					cursor: not-allowed;
-					background: var(--gray-300);
-					color: var(--gray-500);
-					transform: none;
-					
-					&:hover {
-						transform: none;
-						box-shadow: none;
-					}
+					background: var(--gray-200);
+					color: var(--gray-400);
+					border-color: var(--border);
 				}
-				
+
 				&:not(:disabled):hover {
 					transform: translateY(-1px);
-					box-shadow: var(--shadow-md);
 				}
 			}
-			
+
 			.active {
-				background: var(--primary-700);
-				color: var(--white);
+				background: var(--primary-600);
+				border-color: var(--primary-600);
+				color: var(--on-accent);
 				box-shadow: var(--shadow-md);
-				transform: translateY(-1px);
+
+				&:hover {
+					background: var(--primary-700);
+					border-color: var(--primary-700);
+					color: var(--on-accent);
+				}
 			}
 		}
 
+		// `space-evenly` pushed the label and field apart by a varying amount;
+		// `space-between` with a consistent gap lines these rows up with the
+		// colour rows below them.
 		.lineWidth {
 			display: flex;
-			justify-content: space-evenly;
+			justify-content: space-between;
 			align-items: center;
-			gap: var(--space-2);
+			gap: var(--space-3);
 
 			input {
-				max-width: 60px;
 				@include input;
-				padding: var(--space-1) var(--space-2);
+				width: 72px;
+				flex-shrink: 0;
+				padding: var(--space-2);
 				font-size: var(--font-size-sm);
 				text-align: center;
 			}
@@ -276,58 +282,38 @@
 
 		.color {
 			display: flex;
-			justify-content: space-evenly;
-			gap: var(--space-2);
-			
-			input[type="color"] {
-				width: 40px;
-				height: 35px;
-				border: none;
-				border-radius: var(--radius-md);
-				cursor: pointer;
-				transition: var(--transition-normal);
-				
-				&:hover {
-					transform: scale(1.1);
-				}
-			}
+			justify-content: space-between;
+			align-items: center;
+			gap: var(--space-3);
 		}
 
+		// Undo / Redo / Clear. These were `space-around` with a fixed 35px
+		// height, so the labels wrapped and the row spacing did not match the
+		// rest of the panel.
 		.buttonsSection {
 			display: flex;
-			justify-content: space-around;
+			flex-wrap: wrap;
 			gap: var(--space-2);
 
 			.button {
-				flex-grow: 1;
 				@include button-secondary;
-				height: 35px;
+				flex: 1 1 auto;
+				width: auto;
+				min-height: 38px;
 				padding: var(--space-2) var(--space-3);
 				font-size: var(--font-size-sm);
-				font-weight: var(--font-weight-medium);
+				white-space: nowrap;
 				border-radius: var(--radius-md);
-				transition: var(--transition-normal);
-				
-				&:focus {
-					outline: none;
-					box-shadow: 0 0 0 3px var(--primary-100);
-				}
 
 				&:disabled {
 					cursor: not-allowed;
-					background: var(--gray-300);
-					color: var(--gray-500);
-					transform: none;
-					
-					&:hover {
-						transform: none;
-						box-shadow: none;
-					}
+					background: var(--gray-200);
+					color: var(--gray-400);
+					border-color: var(--border);
 				}
-				
+
 				&:not(:disabled):hover {
 					transform: translateY(-1px);
-					box-shadow: var(--shadow-md);
 				}
 			}
 		}
@@ -338,8 +324,8 @@
 	flex-grow: 3;
 	max-height: 35%;
 	@include card;
-	background: rgba(255, 255, 255, 0.1);
-	border: 1px solid rgba(255, 255, 255, 0.2);
+	background: var(--surface-muted);
+	border: 1px solid var(--border);
 	padding: var(--space-4);
 	color: var(--textColor2);
 	font-size: var(--font-size-base);
@@ -380,7 +366,7 @@
 		
 		.green {
 			background: var(--success-500);
-			color: var(--white);
+			color: var(--on-accent);
 			
 			&:hover {
 				background: var(--success-600);
@@ -391,7 +377,7 @@
 		
 		.red {
 			background: var(--error-500);
-			color: var(--white);
+			color: var(--on-accent);
 			
 			&:hover {
 				background: var(--error-600);

@@ -1,22 +1,39 @@
-@import 'variables';
+@use 'variables' as *;
 
 .container {
+	position: relative;
 	display: flex;
-	width: 100vw;
-	height: 92vh;
-	// justify-content: space-between;
 	justify-content: center;
 	align-items: center;
 
-	// @media (max-width: 768px) {
-	// 	justify-content: center;
-	// }
+	// `100vw` includes the scrollbar gutter, which forced a horizontal
+	// scrollbar; `92vh` was a guess at "viewport minus navbar" that drifted
+	// whenever the navbar height changed. Filling the remaining flex space of
+	// the app shell tracks it exactly.
+	width: 100%;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+	background: var(--canvasColor);
 }
 
-#orientationMessage {
+// Shown instead of the board when a phone is held upright.
+.orientationMessage {
+	display: flex;
+	align-items: center;
 	justify-content: center;
+	width: 100%;
+	flex: 1;
+	padding: var(--space-8) var(--space-6);
+	text-align: center;
+
 	p {
-		color: $textInverse;
-		font-size: $fontSize2;
+		max-width: 32ch;
+		margin-bottom: 0;
+		// Was `$textInverse`, which resolves to the *opposite* of the page text
+		// colour - so the message was invisible against the background.
+		color: var(--textColor2);
+		font-size: var(--font-size-lg);
+		line-height: var(--line-height-relaxed);
 	}
 }

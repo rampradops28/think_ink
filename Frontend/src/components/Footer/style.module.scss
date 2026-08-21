@@ -1,150 +1,52 @@
-/* Variables */
-@import 'variables';
+@use 'variables' as *;
 
-/* Enhanced Footer Styles */
+/* Footer */
 .footer {
 	@include flex-between;
+	flex-wrap: wrap;
+	gap: var(--space-3);
 	position: sticky;
 	bottom: 0;
 	z-index: var(--z-sticky);
-	font-size: var(--font-size-base);
+	font-size: var(--font-size-sm);
 	max-width: 100%;
 	min-height: 60px;
-	padding: var(--space-4) var(--space-6);
-	background: rgba(15, 23, 42, 0.95);
-	backdrop-filter: blur(10px);
-	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	padding: var(--space-3) var(--space-4);
+
+	// Was pinned to a dark slate regardless of theme, which left the text
+	// unreadable in light mode.
+	background: var(--glass-bg);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border-top: 1px solid var(--glass-border);
 	border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 	box-shadow: var(--shadow-lg);
 	color: var(--textColor2);
-	transition: var(--transition-normal);
-	
+	animation: footerSlideUp 0.5s ease-out;
+
 	@include md {
 		padding: var(--space-4) var(--space-8);
+		font-size: var(--font-size-base);
 		min-height: 70px;
 	}
-	
+
 	@include lg {
 		padding: var(--space-4) var(--space-12);
 	}
-	
-	// Add subtle shadow on scroll
-	&.scrolled {
-		box-shadow: var(--shadow-xl);
-		background: rgba(15, 23, 42, 0.98);
+
+	p {
+		margin-bottom: 0;
+		color: var(--textColor3);
 	}
-	
-	// Footer content sections
-	.leftSection {
-		@include flex-center;
-		gap: var(--space-4);
-		
-		.logo {
-			font-weight: var(--font-weight-bold);
-			font-size: var(--font-size-lg);
-			background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
-			-webkit-background-clip: text;
-			-webkit-text-fill-color: transparent;
-			background-clip: text;
-		}
-		
-		.copyright {
-			font-size: var(--font-size-sm);
-			color: var(--textColor3);
-			font-weight: var(--font-weight-normal);
-		}
-	}
-	
-	.centerSection {
-		@include flex-center;
-		gap: var(--space-6);
-		
-		.navLinks {
-			@include flex-center;
-			gap: var(--space-4);
-			
-			a {
-				color: var(--textColor2);
-				font-size: var(--font-size-sm);
-				font-weight: var(--font-weight-medium);
-				transition: var(--transition-normal);
-				padding: var(--space-2) var(--space-3);
-				border-radius: var(--radius-md);
-				
-				&:hover {
-					color: var(--primary-400);
-					background: rgba(59, 130, 246, 0.1);
-					transform: translateY(-1px);
-				}
-			}
-		}
-	}
-	
-	.rightSection {
-		@include flex-center;
-		gap: var(--space-4);
-		
-		.socialLinks {
-			@include flex-center;
-			gap: var(--space-3);
-			
-			a {
-				@include icon;
-				color: var(--textColor2);
-				
-				&:hover {
-					color: var(--primary-400);
-					background: rgba(59, 130, 246, 0.1);
-					transform: scale(1.1);
-				}
-			}
-		}
-		
-		.version {
-			font-size: var(--font-size-xs);
-			color: var(--textColor3);
-			font-weight: var(--font-weight-normal);
-		}
+
+	// Below the md breakpoint the four groups stack instead of squeezing.
+	@media (max-width: #{$breakpoint-md - 1px}) {
+		justify-content: center;
+		text-align: center;
 	}
 }
 
-// Responsive design
-@media (max-width: 768px) {
-	.footer {
-		flex-direction: column;
-		gap: var(--space-3);
-		padding: var(--space-3) var(--space-4);
-		min-height: auto;
-		
-		.leftSection,
-		.centerSection,
-		.rightSection {
-			width: 100%;
-			justify-content: center;
-		}
-		
-		.centerSection {
-			.navLinks {
-				flex-wrap: wrap;
-				gap: var(--space-2);
-				
-				a {
-					font-size: var(--font-size-xs);
-					padding: var(--space-1) var(--space-2);
-				}
-			}
-		}
-		
-		.rightSection {
-			.socialLinks {
-				gap: var(--space-2);
-			}
-		}
-	}
-}
-
-// Animation for footer appearance
-@keyframes slideUp {
+@keyframes footerSlideUp {
 	from {
 		opacity: 0;
 		transform: translateY(20px);
@@ -153,8 +55,4 @@
 		opacity: 1;
 		transform: translateY(0);
 	}
-}
-
-.footer {
-	animation: slideUp 0.5s ease-out;
 }

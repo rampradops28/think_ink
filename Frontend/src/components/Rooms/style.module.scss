@@ -1,5 +1,5 @@
 /* Variables */
-@import 'variables';
+@use 'variables' as *;
 
 // $room-bg-color: #d1d0d0;
 // $room-bg-color-other: #1323ad;
@@ -20,7 +20,7 @@
 		padding: calc($border-padding / 2);
 		flex-wrap: wrap;
 		p {
-			color: $white !important;
+			color: var(--on-accent) !important;
 		}
 		:nth-child(2) {
 			flex-grow: 1;
@@ -30,7 +30,7 @@
 }
 .icon {
 	font-size: $fontSize3;
-	color: $white;
+	color: var(--on-accent);
 	transition: var(--transition);
 	&:hover {
 		font-size: $fontSize2;

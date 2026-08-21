@@ -1,19 +1,20 @@
-const twitter = 'https://twitter.com/mr_shivamgarg';
-// const facebook = 'https://facebook.com';
-// const instagram = 'https://instagram.com';
-const linkedin = 'https://www.linkedin.com/in/shivamgarg1234/';
-const github = 'https://github.com/aslezar';
+const github = 'https://github.com/rampradops28';
+const linkedin = '';
+const twitter = '';
+
 const socials = {
 	twitter,
-	// facebook,
-	// instagram,
 	linkedin,
 	github,
 };
+
 const data = {
-	title: 'ShareSketch',
+	title: 'ThinkInk',
+	tagline: 'Think it. Ink it. Share it.',
 	description:
-		'ShareSketch is a collaborative whiteboard platform, where anyone can come and draw and share their ideas with each other.',
+		'ThinkInk is a real-time collaborative whiteboard where you and your team can sketch, brainstorm and chat on a shared canvas.',
+	repository: 'https://github.com/rampradops28/think_ink',
 	socials,
 };
+
 export default data;

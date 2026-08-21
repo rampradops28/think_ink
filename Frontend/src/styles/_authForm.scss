@@ -1,0 +1,189 @@
+@use 'variables' as *;
+
+/**
+ * Shared layout for the sign-in and sign-up dialogs.
+ *
+ * Both forms have the same structure, so the design lives in one mixin rather
+ * than being duplicated (and drifting) across two modules.
+ */
+@mixin auth-form {
+	.wrapper {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-6);
+		width: 100%;
+	}
+
+	.headContainer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-1);
+		text-align: center;
+	}
+
+	.heading {
+		margin-bottom: 0;
+		font-size: var(--font-size-2xl);
+		font-weight: var(--font-weight-bold);
+		letter-spacing: -0.02em;
+		color: var(--gray-900);
+
+		@include sm {
+			font-size: var(--font-size-3xl);
+		}
+	}
+
+	.subheading {
+		margin-bottom: 0;
+		font-size: var(--font-size-sm);
+		color: var(--gray-500);
+	}
+
+	// "Use demo login" - a quiet secondary affordance, not a heading.
+	.dummyLogin {
+		margin: 0;
+		align-self: center;
+		padding: var(--space-1) var(--space-3);
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-medium);
+		font-style: normal;
+		color: var(--primary-600);
+		background: var(--primary-50);
+		border: 1px dashed var(--primary-200);
+		border-radius: var(--radius-full);
+		cursor: pointer;
+		transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+
+		&:hover {
+			background: var(--primary-100);
+			border-color: var(--primary-300);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--primary-500);
+			outline-offset: 2px;
+		}
+
+		&:disabled {
+			opacity: 0.55;
+			cursor: not-allowed;
+		}
+	}
+
+	.form {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+	}
+
+	// Was `margin: 10px` with an unstyled inline label. Labels now sit above
+	// their field on their own line, with consistent token-based spacing.
+	.inputContainer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+		margin: 0;
+
+		label {
+			font-size: var(--font-size-sm);
+			font-weight: var(--font-weight-medium);
+			color: var(--gray-700);
+		}
+
+		input {
+			@include input;
+		}
+	}
+
+	// Password fields carry a reveal toggle inside the field.
+	.passwordField {
+		position: relative;
+		display: flex;
+		align-items: center;
+
+		input {
+			// Room for the toggle so long values do not run under it.
+			padding-right: var(--space-10);
+		}
+	}
+
+	.revealButton {
+		position: absolute;
+		right: var(--space-2);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: var(--space-2);
+		background: transparent;
+		border: none;
+		border-radius: var(--radius-md);
+		color: var(--gray-500);
+		cursor: pointer;
+		transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+
+		&:hover {
+			color: var(--primary-600);
+			background: var(--primary-50);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--primary-500);
+			outline-offset: 2px;
+		}
+	}
+
+	.hint {
+		font-size: var(--font-size-xs);
+		color: var(--gray-500);
+	}
+
+	.actoinContainer {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-3);
+		margin-top: var(--space-2);
+		text-align: left;
+
+		a {
+			font-size: var(--font-size-sm);
+			color: var(--accent);
+			align-self: flex-end;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+
+	// Divider above the "switch to the other form" link.
+	.switchRow {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: var(--space-1);
+		padding-top: var(--space-4);
+		border-top: 1px solid var(--border);
+		font-size: var(--font-size-sm);
+		color: var(--gray-500);
+	}
+
+	.hoverUnderline {
+		background: none;
+		border: none;
+		padding: 0;
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-semibold);
+		color: var(--accent);
+		cursor: pointer;
+
+		&:hover {
+			text-decoration: underline;
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--primary-500);
+			outline-offset: 2px;
+			border-radius: var(--radius-sm);
+		}
+	}
+}

@@ -1,5 +1,5 @@
 /* Variables */
-@import 'variables';
+@use 'variables' as *;
 
 $error-border-color: #69a3e3;
 $error-text-color: #1e4fd8;

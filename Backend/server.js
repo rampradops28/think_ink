@@ -5,12 +5,11 @@ const http = require('http');
 
 const helmet = require('helmet');
 const cors = require('cors');
-const xss = require('xss-clean');
 const rateLimiter = require('express-rate-limit');
+const sanitize = require('./middleware/sanitize');
 
 const morgan = require('morgan');
 
-require('express-async-errors');
 require('dotenv').config();
 
 const connectDB = require('./db/connect');
@@ -43,12 +42,13 @@ const io = require('socket.io')(server, {
 	},
 });
 require('./socketio')(io);
-//Admin UI
-const { instrument } = require('@socket.io/admin-ui');
-instrument(io, { auth: false });
 
-//Setting Environment
-const PORT = process.env.PORT || 5000;
+//Admin UI - development only, it exposes live server internals
+if (!isProduction) {
+	const { instrument } = require('@socket.io/admin-ui');
+	instrument(io, { auth: false });
+}
+
 app.set('trust proxy', 1);
 
 //Security Middleware
@@ -56,6 +56,8 @@ app.use(
 	rateLimiter({
 		windowMs: 15 * 60 * 1000, //15 minutes
 		max: 100, //limit each IP to 100 requests per windowMs
+		standardHeaders: 'draft-7',
+		legacyHeaders: false,
 	})
 );
 app.use(express.json());
@@ -69,21 +71,25 @@ app.use(
 app.use(xss()); //prevent XSS attacks
 app.use(morgan('common')); //logger
 
-//Routes
-app.use('/', express.static('../client/dist'));
-app.use('/assests', express.static('../client/dist/assests'));
+//Static client build
+const clientDist = path.join(__dirname, '..', 'Frontend', 'dist');
+app.use(express.static(clientDist));
 
 //Define Routes Here
-
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/room', require('./routes/room'));
 app.use('/api/user', require('./middleware/auth'), require('./routes/user'));
 
-app.get('/*', (req, res) => {
-	res.sendFile(path.join(__dirname, '../client/dist/index.html'), (err) => {
-		if (err) {
-			console.error('Error sending file:', err);
-		}
+app.get('/api/health', (req, res) => {
+	res.status(200).json({ success: true, msg: 'Server is healthy' });
+});
+
+// SPA fallback. Express 5 uses path-to-regexp v8, where a bare '/*' is no
+// longer a valid pattern - an unnamed wildcard throws at registration time.
+app.use((req, res, next) => {
+	if (req.method !== 'GET' || req.path.startsWith('/api')) return next();
+	res.sendFile(path.join(clientDist, 'index.html'), (err) => {
+		if (err) next();
 	});
 });
 
@@ -105,7 +111,7 @@ async function start() {
 		}
 
 		await connectDB(process.env.MONGO_URL);
-		console.log('Connected to the DataBase Sucessfully');
+		console.log('Connected to the DataBase Successfully');
 		server.listen(PORT, () => {
 			console.log(`Server is listening on http://localhost:${PORT}`);
 		});

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import style from './style.module.scss';
 import { IoIosUndo, IoIosRedo } from 'react-icons/io';
 import { GrClearOption } from 'react-icons/gr';
@@ -28,8 +29,8 @@ const Toolbox = ({
 	roomUsers,
 	curUser,
 }) => {
-	// console.log('toolbox');
-	// const [showUser, setShowUser] = useState(false);
+	const [collapsed, setCollapsed] = useState(false);
+
 	const handleChange = (e) => {
 		setToolbox((prevState) => ({
 			...prevState,
@@ -45,15 +46,20 @@ const Toolbox = ({
 		navigator.clipboard.writeText(window.location.href);
 	};
 	return (
-		<div
-			id='wrapper'
-			className={style.wrapper}>
-			<AiOutlineClear
-				className={style.toolicon}
-				onClick={() => {
-					wrapper.classList.toggle(style.hide);
-				}}
-			/>
+		<div className={`${style.wrapper} ${collapsed ? style.hide : ''}`}>
+			{/*
+			  This previously toggled the class via the implicit `window.wrapper`
+			  global that browsers create for elements with an id - it worked by
+			  accident and broke whenever the id changed. React state now owns it.
+			*/}
+			<button
+				type='button'
+				className={style.toolToggle}
+				aria-label={collapsed ? 'Show toolbox' : 'Hide toolbox'}
+				aria-expanded={!collapsed}
+				onClick={() => setCollapsed((prev) => !prev)}>
+				<AiOutlineClear className={style.toolicon} />
+			</button>
 			<div
 				id='tool'
 				className={style.container}>
@@ -87,8 +93,13 @@ const Toolbox = ({
 					</div>
 				</div>
 				<div className={style.toolbox}>
-					<section className={style.tools}>
-						<label htmlFor='tool'>Tools: </label>
+					{/* `htmlFor` pointed at ids that do not exist on form controls,
+					    so the labels were inert. Grouping semantics instead. */}
+					<section
+						className={style.tools}
+						role='group'
+						aria-label='Drawing tools'>
+						<span className={style.label}>Tools: </span>
 						<span>
 							<button
 								className={`${style.button} ${
@@ -131,8 +142,9 @@ const Toolbox = ({
 					<section className={style.lineWidth}>
 						<label htmlFor='lineWidth'>LineWidth:</label>
 						<input
+							id='lineWidth'
 							type='number'
-							name={'lineWidth'}
+							name='lineWidth'
 							value={toolbox.lineWidth}
 							min={1}
 							max={100}
@@ -140,13 +152,9 @@ const Toolbox = ({
 						/>
 					</section>
 					<section className={style.color}>
-						<label htmlFor='strokeStyle'>Color:</label>
-						{/* <input
-							type='color'
-							name='strokeStyle'
-							onChange={handleChange}
-						/> */}
+						<span className={style.label}>Color:</span>
 						<ColorPicker
+							label='stroke colour'
 							color={toolbox.strokeStyle}
 							changeColor={(color) => {
 								setToolbox((prevState) => ({
@@ -157,13 +165,9 @@ const Toolbox = ({
 						/>
 					</section>
 					<section className={style.color}>
-						<label htmlFor='fillStyle'>Fill Color:</label>
-						{/* <input
-							type='color'
-							name='fillStyle'
-							onChange={handleChange}
-						/> */}
+						<span className={style.label}>Fill Color:</span>
 						<ColorPicker
+							label='fill colour'
 							color={toolbox.fillStyle}
 							changeColor={(color) => {
 								setToolbox((prevState) => ({

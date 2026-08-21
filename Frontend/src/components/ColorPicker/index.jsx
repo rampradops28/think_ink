@@ -1,61 +1,91 @@
-import React, { useState, useRef } from 'react';
-import { ChromePicker } from 'react-color';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { RgbaColorPicker } from 'react-colorful';
+import style from './style.module.scss';
 
-function ColorPickerComponent({ color, changeColor }) {
-	const [inputColor, setInputColor] = useState(color);
-	const [showColorPicker, setShowColorPicker] = useState(false);
-	const anchorRef = useRef(null);
+const DEFAULT_COLOR = { r: 0, g: 0, b: 0, a: 1 };
 
-	const handleColorChange = (newColor) => {
-		const { r, g, b, a } = newColor.rgb;
-		const rgbaColor = `rgba(${r}, ${g}, ${b}, ${a})`;
-		setInputColor(rgbaColor);
+// Toolbox state stores colours as `rgba(r, g, b, a)` strings so they can be
+// handed straight to the canvas context; react-colorful works with objects.
+const parseRgba = (value) => {
+	if (!value || typeof value !== 'string') return DEFAULT_COLOR;
+	const match = value.match(
+		/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)/i
+	);
+	if (!match) return DEFAULT_COLOR;
+	return {
+		r: Number(match[1]),
+		g: Number(match[2]),
+		b: Number(match[3]),
+		a: match[4] === undefined ? 1 : Number(match[4]),
 	};
-	const handleColorChangeComplete = (newColor) => {
-		const { r, g, b, a } = newColor.rgb;
-		const rgbaColor = `rgba(${r}, ${g}, ${b}, ${a})`;
-		changeColor(rgbaColor);
-		toggleColorPicker();
+};
+
+const toRgbaString = ({ r, g, b, a }) => `rgba(${r}, ${g}, ${b}, ${a})`;
+
+function ColorPickerComponent({ color, changeColor, label }) {
+	const [pickerColor, setPickerColor] = useState(() => parseRgba(color));
+	const [isOpen, setIsOpen] = useState(false);
+	const containerRef = useRef(null);
+
+	// Keep in sync when the colour is changed elsewhere (e.g. tool reset).
+	useEffect(() => {
+		setPickerColor(parseRgba(color));
+	}, [color]);
+
+	const close = useCallback(() => setIsOpen(false), []);
+
+	// Close on outside click and on Escape - the old implementation had no way
+	// to dismiss the picker except re-clicking the swatch.
+	useEffect(() => {
+		if (!isOpen) return;
+
+		const handlePointerDown = (event) => {
+			if (containerRef.current && !containerRef.current.contains(event.target)) {
+				close();
+			}
+		};
+		const handleKeyDown = (event) => {
+			if (event.key === 'Escape') close();
+		};
+
+		document.addEventListener('mousedown', handlePointerDown);
+		document.addEventListener('keydown', handleKeyDown);
+		return () => {
+			document.removeEventListener('mousedown', handlePointerDown);
+			document.removeEventListener('keydown', handleKeyDown);
+		};
+	}, [isOpen, close]);
+
+	const handleChange = (newColor) => {
+		setPickerColor(newColor);
+		changeColor(toRgbaString(newColor));
 	};
 
-	const toggleColorPicker = () => {
-		setShowColorPicker((prevShowColorPicker) => !prevShowColorPicker);
-	};
-
-	const colorButtonStyle = {
-		backgroundColor: inputColor || 'transparent',
-		width: '50px',
-	};
-
-	const colorPickerStyle = {
-		position: 'absolute',
-		top: anchorRef.current
-			? anchorRef.current.offsetTop + anchorRef.current.offsetHeight
-			: 0,
-		left: anchorRef.current
-			? anchorRef.current.offsetLeft + anchorRef.current.offsetWidth
-			: 0,
-
-		transform: 'translate(0%, -100%)',
-		zIndex: 1,
-	};
 	return (
-		<>
+		<div
+			className={style.wrapper}
+			ref={containerRef}>
 			<button
-				onClick={toggleColorPicker}
-				ref={anchorRef}
-				style={colorButtonStyle}
-			/>
-			{showColorPicker && (
-				<div style={colorPickerStyle}>
-					<ChromePicker
-						color={inputColor}
-						onChange={handleColorChange}
-						onChangeComplete={handleColorChangeComplete}
+				type='button'
+				className={style.swatch}
+				aria-label={label ? `Choose ${label}` : 'Choose colour'}
+				aria-expanded={isOpen}
+				onClick={() => setIsOpen((prev) => !prev)}>
+				<span
+					className={style.swatchFill}
+					style={{ backgroundColor: toRgbaString(pickerColor) }}
+				/>
+			</button>
+			{isOpen && (
+				<div className={style.popover}>
+					<RgbaColorPicker
+						color={pickerColor}
+						onChange={handleChange}
 					/>
+					<div className={style.value}>{toRgbaString(pickerColor)}</div>
 				</div>
 			)}
-		</>
+		</div>
 	);
 }
 

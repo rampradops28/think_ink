@@ -2,19 +2,45 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link
-			rel="icon"
-			type="image/svg+xml"
-			href="/logo.png" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+		<title>ThinkInk — Collaborative Whiteboard</title>
 		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0" />
-		<title>ShareSketch</title>
+			name="description"
+			content="ThinkInk is a real-time collaborative whiteboard. Sketch, brainstorm and chat with your team on a shared canvas." />
+		<meta name="theme-color" content="#0f172a" />
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="apple-touch-icon" href="/favicon.svg" />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="ThinkInk — Collaborative Whiteboard" />
+		<meta
+			property="og:description"
+			content="Sketch, brainstorm and chat with your team on a shared real-time canvas." />
+		<meta name="twitter:card" content="summary_large_image" />
+
+		<!--
+			Self-hosted-style font load: preconnect first so the DNS/TLS handshake
+			overlaps with HTML parsing, and `display=swap` so text paints in a
+			fallback face instead of staying invisible while the font downloads.
+		-->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+			media="print"
+			onload="this.media='all'" />
+		<noscript>
+			<link
+				rel="stylesheet"
+				href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+		</noscript>
 	</head>
 	<body>
 		<div id="root"></div>
-		<script
-			type="module"
-			src="/src/main.jsx"></script>
+		<script type="module" src="/src/main.jsx"></script>
 	</body>
 </html>

@@ -104,9 +104,37 @@ const signOut = async (req, res) => {
 	});
 };
 
+// Shared "kick the tyres" account.
+const DEMO_USER = {
+	name: 'Demo User',
+	email: 'temp@temp.com',
+	password: 'temp@temp.com',
+	bio: 'Exploring ThinkInk with the shared demo account.',
+};
+
+/**
+ * Signs in to the demo account, creating it on first use.
+ *
+ * The sign-in dialog used to just type these credentials into the form. They
+ * referenced an account that only existed in the database of the project this
+ * was forked from, so on any fresh install the demo button filled in an email
+ * and then failed with "Email Not Registered". Provisioning it server-side
+ * makes the demo work on any clone.
+ */
+const demoLogin = async (req, res) => {
+	let user = await User.findOne({ email: DEMO_USER.email });
+
+	if (!user) {
+		user = await User.create(DEMO_USER);
+	}
+
+	sendUserData(user, res, 'Signed in with the demo account');
+};
+
 module.exports = {
 	register,
 	login,
 	tokenLogin,
 	signOut,
+	demoLogin,
 };
